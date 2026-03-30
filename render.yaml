@@ -1,0 +1,15 @@
+# render.yaml - configuración para Render (servicio web + base de datos Postgres)
+services:
+  - type: web
+    name: loreweb-backend
+    env: docker
+    dockerfilePath: Dockerfile
+    plan: free
+    autoDeploy: true
+    repo: "https://github.com/joshhhe/LoreWeb.git"
+    branch: main
+
+databases:
+  - name: loreweb-db
+    engine: postgresql
+    plan: free

@@ -1,0 +1,943 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/output.css" />
+    <style>
+      /* Ensure image containers are fixed height and images are centered and contained
+           so cards remain symmetric and no large white gaps appear. Responsive: smaller
+           height on small screens, larger on medium+ screens. */
+      .sexo > .relative {
+        height: 16rem; /* 256px roughly equals Tailwind h-64 */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      @media (min-width: 768px) {
+        .sexo > .relative {
+          height: 24rem; /* Tailwind md:h-96 */
+        }
+      }
+      .sexo > .relative img {
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+        display: block;
+        margin: 0 auto;
+      }
+      .sexo {
+        transition:
+          box-shadow 200ms ease,
+          transform 120ms ease;
+      }
+      .sexo:hover {
+        box-shadow:
+          0 0 0 3px #d97706,
+          0 8px 20px rgba(0, 0, 0, 0.06);
+        transform: translateY(-4px);
+      }
+    </style>
+    <title>Servicios - LoreWeb</title>
+  </head>
+  <body class="bg-gray-50 min-h-screen">
+    <header class="sticky top-0 z-50 bg-white shadow-md">
+      <nav class="container mx-auto px-6 py-4">
+        <div class="flex justify-between items-center">
+          <!-- Logo -->
+          <a href="/" class="cursor-pointer">
+            <img
+              src="/images/logo.png"
+              alt="LorenaBraids"
+              class="h-12 w-auto hover:opacity-80 transition"
+            />
+          </a>
+
+          <!-- Navigation Links -->
+          <ul class="hidden md:flex gap-8 items-center">
+            <li>
+              <a
+                href="/"
+                class="text-gray-700 font-semibold hover:text-amber-600 transition"
+              >
+                HOME
+              </a>
+            </li>
+            <li>
+              <a
+                href="/servicios"
+                class="text-gray-700 font-semibold hover:text-amber-600 transition"
+              >
+                BOOK
+              </a>
+            </li>
+            <li>
+              <a
+                href="/productos"
+                class="text-gray-700 font-semibold hover:text-amber-600 transition"
+              >
+                SHOP
+              </a>
+            </li>
+            <li>
+              <a
+                href="/sobre-mi"
+                class="text-gray-700 font-semibold hover:text-amber-600 transition"
+              >
+                ABOUT ME
+              </a>
+            </li>
+
+            <!-- User Profile Section (only visible when logged in) -->
+            <li id="userProfileNav" class="hidden items-center gap-4">
+              <div
+                class="flex items-center gap-2 bg-amber-50 px-4 py-2 rounded-full border border-amber-200"
+              >
+                <svg
+                  class="w-5 h-5 text-amber-600"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                <span
+                  id="userNameDisplay"
+                  class="text-gray-800 font-medium text-sm"
+                  >Usuario</span
+                >
+              </div>
+              <button
+                id="logoutBtn"
+                class="text-gray-700 hover:text-red-600 transition font-semibold px-3 py-1 rounded-lg hover:bg-red-50"
+              >
+                Salir
+              </button>
+            </li>
+
+            <!-- Reservar Button -->
+            <li>
+              <a
+                href="/citas"
+                class="bg-amber-600 text-white px-6 py-2 rounded-full hover:bg-amber-700 transition font-medium shadow-md"
+              >
+                RESERVAR
+              </a>
+            </li>
+
+            <!-- Shopping Cart Button -->
+            <li>
+              <button
+                class="relative p-2 text-gray-700 hover:text-amber-600 transition"
+                aria-label="Carrito de compras"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="2"
+                  stroke="currentColor"
+                  class="w-6 h-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                  />
+                </svg>
+                <!-- Badge para cantidad de items (opcional) -->
+                <span
+                  class="absolute -top-1 -right-1 bg-amber-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
+                >
+                  0
+                </span>
+              </button>
+            </li>
+          </ul>
+
+          <!-- Mobile Menu Button -->
+          <button class="md:hidden text-gray-700 hover:text-amber-600">
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="bg-gray-50 min-h-screen">
+      <!-- Services Section -->
+      <section class="container mx-auto px-6 py-12">
+        <div class="flex flex-col lg:flex-row gap-8 relative">
+          <!-- Sidebar - Category Filter -->
+          <aside class="lg:w-64 shrink-0">
+            <div
+              class="bg-white rounded-lg p-6 shadow-sm lg:fixed lg:w-56 lg:top-24"
+            >
+              <h3
+                class="text-sm font-bold text-gray-500 uppercase mb-4 tracking-wide"
+              >
+                Por Categoría
+              </h3>
+              <ul class="space-y-3">
+                <li>
+                  <button
+                    id="btnTodos"
+                    class="text-left w-full text-gray-700 hover:text-amber-600 transition font-medium py-1"
+                  >
+                    Todos los Estilos
+                  </button>
+                </li>
+                <li>
+                  <button
+                    class="text-left w-full text-amber-600 font-semibold py-1"
+                    id="btnMujeres"
+                  >
+                    Mujeres
+                  </button>
+                </li>
+                <li>
+                  <button
+                    class="text-left w-full text-gray-700 hover:text-amber-600 transition font-medium py-1"
+                    id="btnHombres"
+                  >
+                    Hombres
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </aside>
+
+          <!-- Main Content -->
+          <div class="flex-1">
+            <!-- Section Header -->
+            <div class="mb-8">
+              <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-3">
+                STYLES
+              </h1>
+              <div class="w-20 h-1 bg-amber-500"></div>
+            </div>
+
+            <!-- Services Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Auto-generated cards: Trenzado-mujeres -->
+              <div
+                class="sexo bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                data-sexo="mujeres"
+              >
+                <div class="relative">
+                  <img
+                    src="/images/Trenzado-mujeres/braids.jpeg"
+                    alt="braids"
+                    class="w-full max-h-96 object-contain mx-auto"
+                  />
+                </div>
+                <div class="p-5 border-t-2 border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <h3
+                      class="text-base font-bold text-gray-900 uppercase tracking-wide"
+                    >
+                      CornsRows
+                    </h3>
+                    <span class="text-base font-bold text-gray-900"
+                      >$50.000</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="sexo bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                data-sexo="mujeres"
+              >
+                <div class="relative">
+                  <img
+                    src="/images/Trenzado-mujeres/cellImage_0_1.jpg"
+                    alt="cellImage 0 1"
+                    class="w-full max-h-96 object-contain mx-auto"
+                  />
+                </div>
+                <div class="p-5 border-t-2 border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <h3
+                      class="text-base font-bold text-gray-900 uppercase tracking-wide"
+                    >
+                      TrenzaFrontal con Accesorios
+                    </h3>
+                    <span class="text-base font-bold text-gray-900"
+                      >$30.000</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="sexo bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                data-sexo="mujeres"
+              >
+                <div class="relative">
+                  <img
+                    src="/images/Trenzado-mujeres/cellImage_0_2.jpg"
+                    alt="cellImage 0 2"
+                    class="w-full max-h-96 object-contain mx-auto"
+                  />
+                </div>
+                <div class="p-5 border-t-2 border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <h3
+                      class="text-base font-bold text-gray-900 uppercase tracking-wide"
+                    >
+                      Cornrows
+                    </h3>
+                    <span class="text-base font-bold text-gray-900"
+                      >$50.000</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="sexo bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                data-sexo="mujeres"
+              >
+                <div class="relative">
+                  <img
+                    src="/images/Trenzado-mujeres/cellImage_0_3.jpg"
+                    alt="cellImage 0 3"
+                    class="w-full max-h-96 object-contain mx-auto"
+                  />
+                </div>
+                <div class="p-5 border-t-2 border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <h3
+                      class="text-base font-bold text-gray-900 uppercase tracking-wide"
+                    >
+                      Timinis con trenzas de detalle
+                    </h3>
+                    <span class="text-base font-bold text-gray-900"
+                      >$45.000</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="sexo bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                data-sexo="mujeres"
+              >
+                <div class="relative">
+                  <img
+                    src="/images/Trenzado-mujeres/cellImage_0_4.jpg"
+                    alt="cellImage 0 4"
+                    class="w-full max-h-96 object-contain mx-auto"
+                  />
+                </div>
+                <div class="p-5 border-t-2 border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <h3
+                      class="text-base font-bold text-gray-900 uppercase tracking-wide"
+                    >
+                      Fulani Braids Kanekalon
+                    </h3>
+                    <span class="text-base font-bold text-gray-900"
+                      >$90.000</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="sexo bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                data-sexo="mujeres"
+              >
+                <div class="relative">
+                  <img
+                    src="/images/Trenzado-mujeres/cellImage_0_5.jpg"
+                    alt="cellImage 0 5"
+                    class="w-full max-h-96 object-contain mx-auto"
+                  />
+                </div>
+                <div class="p-5 border-t-2 border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <h3
+                      class="text-base font-bold text-gray-900 uppercase tracking-wide"
+                    >
+                      Fulani braids Natural
+                    </h3>
+                    <span class="text-base font-bold text-gray-900"
+                      >$50.000</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="sexo bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                data-sexo="mujeres"
+              >
+                <div class="relative">
+                  <img
+                    src="/images/Trenzado-mujeres/cellImage_1993376276_0.jpg"
+                    alt="cellImage 1993376276 0"
+                    class="w-full max-h-96 object-contain mx-auto"
+                  />
+                </div>
+                <div class="p-5 border-t-2 border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <h3
+                      class="text-base font-bold text-gray-900 uppercase tracking-wide"
+                    >
+                      Medium Box Briads
+                    </h3>
+                    <span class="text-base font-bold text-gray-900"
+                      >$90.000</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="sexo bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                data-sexo="mujeres"
+              >
+                <div class="relative">
+                  <img
+                    src="/images/Trenzado-mujeres/cellImage_1993376276_1.jpg"
+                    alt="cellImage 1993376276 1"
+                    class="w-full max-h-96 object-contain mx-auto"
+                  />
+                </div>
+                <div class="p-5 border-t-2 border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <h3
+                      class="text-base font-bold text-gray-900 uppercase tracking-wide"
+                    >
+                      Large Knotless Braids
+                    </h3>
+                    <span class="text-base font-bold text-gray-900"
+                      >$70.000</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="sexo bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                data-sexo="mujeres"
+              >
+                <div class="relative">
+                  <img
+                    src="/images/Trenzado-mujeres/cellImage_1993376276_2.jpg"
+                    alt="cellImage 1993376276 2"
+                    class="w-full max-h-96 object-contain mx-auto"
+                  />
+                </div>
+                <div class="p-5 border-t-2 border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <h3
+                      class="text-base font-bold text-gray-900 uppercase tracking-wide"
+                    >
+                      Large Box Braids
+                    </h3>
+                    <span class="text-base font-bold text-gray-900"
+                      >$45.000</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="sexo bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                data-sexo="mujeres"
+              >
+                <div class="relative">
+                  <img
+                    src="/images/Trenzado-mujeres/cellImage_1993376276_3.jpg"
+                    alt="cellImage 1993376276 3"
+                    class="w-full max-h-96 object-contain mx-auto"
+                  />
+                </div>
+                <div class="p-5 border-t-2 border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <h3
+                      class="text-base font-bold text-gray-900 uppercase tracking-wide"
+                    >
+                      Bohemian lemonade Braids
+                    </h3>
+                    <span class="text-base font-bold text-gray-900"
+                      >$100.000</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="sexo bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                data-sexo="mujeres"
+              >
+                <div class="relative">
+                  <img
+                    src="/images/Trenzado-mujeres/cellImage_1993376276_4.jpg"
+                    alt="cellImage 1993376276 4"
+                    class="w-full max-h-96 object-contain mx-auto"
+                  />
+                </div>
+                <div class="p-5 border-t-2 border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <h3
+                      class="text-base font-bold text-gray-900 uppercase tracking-wide"
+                    >
+                      Large Fulani Braids
+                    </h3>
+                    <span class="text-base font-bold text-gray-900"
+                      >$75.000</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="sexo bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                data-sexo="mujeres"
+              >
+                <div class="relative">
+                  <img
+                    src="/images/Trenzado-mujeres/cellImage_1993376276_5.jpg"
+                    alt="cellImage 1993376276 5"
+                    class="w-full max-h-96 object-contain mx-auto"
+                  />
+                </div>
+                <div class="p-5 border-t-2 border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <h3
+                      class="text-base font-bold text-gray-900 uppercase tracking-wide"
+                    >
+                      Small Box Braids
+                    </h3>
+                    <span class="text-base font-bold text-gray-900"
+                      >$90.000</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Auto-generated cards: Trenzado-hombres -->
+              <div
+                class="sexo bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                data-sexo="hombre"
+              >
+                <div class="relative">
+                  <img
+                    src="/images/Trenzado-hombres/cellImage_770678691_0.jpg"
+                    alt="Trenzado hombre 0"
+                    class="w-full max-h-96 object-contain mx-auto"
+                  />
+                </div>
+                <div class="p-5 border-t-2 border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <h3
+                      class="text-base font-bold text-gray-900 uppercase tracking-wide"
+                    >
+                      Trenzado Hombre 1
+                    </h3>
+                    <span class="text-base font-bold text-gray-900"
+                      >Consultar</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="sexo bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                data-sexo="hombre"
+              >
+                <div class="relative">
+                  <img
+                    src="/images/Trenzado-hombres/cellImage_770678691_1.jpg"
+                    alt="Trenzado hombre 1"
+                    class="w-full max-h-96 object-contain mx-auto"
+                  />
+                </div>
+                <div class="p-5 border-t-2 border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <h3
+                      class="text-base font-bold text-gray-900 uppercase tracking-wide"
+                    >
+                      Trenzado Hombre 2
+                    </h3>
+                    <span class="text-base font-bold text-gray-900"
+                      >Consultar</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="sexo bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                data-sexo="hombre"
+              >
+                <div class="relative">
+                  <img
+                    src="/images/Trenzado-hombres/cellImage_770678691_2.jpg"
+                    alt="Trenzado hombre 2"
+                    class="w-full max-h-96 object-contain mx-auto"
+                  />
+                </div>
+                <div class="p-5 border-t-2 border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <h3
+                      class="text-base font-bold text-gray-900 uppercase tracking-wide"
+                    >
+                      Trenzado Hombre 3
+                    </h3>
+                    <span class="text-base font-bold text-gray-900"
+                      >Consultar</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="sexo bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                data-sexo="hombre"
+              >
+                <div class="relative">
+                  <img
+                    src="/images/Trenzado-hombres/cellImage_770678691_3.jpg"
+                    alt="Trenzado hombre 3"
+                    class="w-full max-h-96 object-contain mx-auto"
+                  />
+                </div>
+                <div class="p-5 border-t-2 border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <h3
+                      class="text-base font-bold text-gray-900 uppercase tracking-wide"
+                    >
+                      Trenzado Hombre 4
+                    </h3>
+                    <span class="text-base font-bold text-gray-900"
+                      >Consultar</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="sexo bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                data-sexo="hombre"
+              >
+                <div class="relative">
+                  <img
+                    src="/images/Trenzado-hombres/cellImage_770678691_4.jpg"
+                    alt="Trenzado hombre 4"
+                    class="w-full max-h-96 object-contain mx-auto"
+                  />
+                </div>
+                <div class="p-5 border-t-2 border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <h3
+                      class="text-base font-bold text-gray-900 uppercase tracking-wide"
+                    >
+                      Trenzado Hombre 5
+                    </h3>
+                    <span class="text-base font-bold text-gray-900"
+                      >Consultar</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="sexo bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                data-sexo="hombre"
+              >
+                <div class="relative">
+                  <img
+                    src="/images/Trenzado-hombres/cellImage_770678691_5.jpg"
+                    alt="Trenzado hombre 5"
+                    class="w-full max-h-96 object-contain mx-auto"
+                  />
+                </div>
+                <div class="p-5 border-t-2 border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <h3
+                      class="text-base font-bold text-gray-900 uppercase tracking-wide"
+                    >
+                      Trenzado Hombre 6
+                    </h3>
+                    <span class="text-base font-bold text-gray-900"
+                      >Consultar</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="sexo bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                data-sexo="hombre"
+              >
+                <div class="relative">
+                  <img
+                    src="/images/Trenzado-hombres/gift-habeshaw-ptyj_QoPRsQ-unsplash.jpg"
+                    alt="Trenzado hombre gift"
+                    class="w-full max-h-96 object-contain mx-auto"
+                  />
+                </div>
+                <div class="p-5 border-t-2 border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <h3
+                      class="text-base font-bold text-gray-900 uppercase tracking-wide"
+                    >
+                      Trenzado Hombre 7
+                    </h3>
+                    <span class="text-base font-bold text-gray-900"
+                      >Consultar</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="sexo bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                data-sexo="hombre"
+              >
+                <div class="relative">
+                  <img
+                    src="/images/Trenzado-hombres/trenzasJose.png"
+                    alt="Trenzado Jose"
+                    class="w-full max-h-96 object-contain mx-auto"
+                  />
+                </div>
+                <div class="p-5 border-t-2 border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <h3
+                      class="text-base font-bold text-gray-900 uppercase tracking-wide"
+                    >
+                      Trenzado Hombre 8
+                    </h3>
+                    <span class="text-base font-bold text-gray-900"
+                      >Consultar</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white">
+      <div class="container mx-auto px-6 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <!-- Columna 1: Logo y descripción -->
+          <div class="col-span-1">
+            <h3 class="text-2xl font-bold text-amber-500 mb-4">LorenaBraids</h3>
+            <p class="text-gray-400 text-sm leading-relaxed">
+              Transformando tu belleza natural con el arte del trenzado
+              profesional.
+            </p>
+            <!-- Redes sociales -->
+            <div class="flex gap-4 mt-6">
+              <a
+                href="#"
+                class="w-10 h-10 bg-amber-600 rounded-full flex items-center justify-center hover:bg-amber-700 transition"
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path
+                    d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+                  />
+                </svg>
+              </a>
+              <a
+                href="#"
+                class="w-10 h-10 bg-amber-600 rounded-full flex items-center justify-center hover:bg-amber-700 transition"
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path
+                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+                  />
+                </svg>
+              </a>
+              <a
+                href="#"
+                class="w-10 h-10 bg-amber-600 rounded-full flex items-center justify-center hover:bg-amber-700 transition"
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path
+                    d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"
+                  />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Columna 2: Enlaces rápidos -->
+          <div>
+            <h4 class="text-lg font-semibold mb-4">Enlaces Rápidos</h4>
+            <ul class="space-y-2">
+              <li>
+                <a
+                  href="/"
+                  class="text-gray-400 hover:text-amber-500 transition text-sm"
+                  >Home</a
+                >
+              </li>
+              <li>
+                <a
+                  href="/servicios"
+                  class="text-gray-400 hover:text-amber-500 transition text-sm"
+                  >Servicios</a
+                >
+              </li>
+              <li>
+                <a
+                  href="/productos"
+                  class="text-gray-400 hover:text-amber-500 transition text-sm"
+                  >Productos</a
+                >
+              </li>
+              <li>
+                <a
+                  href="/sobre-mi"
+                  class="text-gray-400 hover:text-amber-500 transition text-sm"
+                  >Sobre Mi</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <!-- Columna 3: Servicios -->
+          <div>
+            <h4 class="text-lg font-semibold mb-4">Servicios</h4>
+            <ul class="space-y-2">
+              <li>
+                <a
+                  href="/servicios"
+                  class="text-gray-400 hover:text-amber-500 transition text-sm"
+                  >Box Braids</a
+                >
+              </li>
+              <li>
+                <a
+                  href="/servicios"
+                  class="text-gray-400 hover:text-amber-500 transition text-sm"
+                  >Knotless Braids</a
+                >
+              </li>
+              <li>
+                <a
+                  href="/servicios"
+                  class="text-gray-400 hover:text-amber-500 transition text-sm"
+                  >Goddess Braids</a
+                >
+              </li>
+              <li>
+                <a
+                  href="/servicios"
+                  class="text-gray-400 hover:text-amber-500 transition text-sm"
+                  >Twist Braids</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <!-- Columna 4: Contacto -->
+          <div>
+            <h4 class="text-lg font-semibold mb-4">Contacto</h4>
+            <ul class="space-y-3 text-sm text-gray-400">
+              <li class="flex items-start gap-2">
+                <svg
+                  class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                <span>Maipu, Santiago Bueras</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <svg
+                  class="w-5 h-5 text-amber-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                  />
+                </svg>
+                <span>+569 1234 5678</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <svg
+                  class="w-5 h-5 text-amber-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
+                </svg>
+                <span>info@lorenabraids.com</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Línea divisoria -->
+        <div class="border-t border-gray-800 mt-8 pt-8">
+          <div
+            class="flex flex-col md:flex-row justify-between items-center gap-4"
+          >
+            <p class="text-gray-400 text-sm">
+              © 2025 LorenaBraids. Todos los derechos reservados.
+            </p>
+            <div class="flex gap-6 text-sm">
+              <a href="#" class="text-gray-400 hover:text-amber-500 transition"
+                >Política de Privacidad</a
+              >
+              <a href="#" class="text-gray-400 hover:text-amber-500 transition"
+                >Términos de Servicio</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <script src="/js/servicios.js"></script>
+  </body>
+</html>

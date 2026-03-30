@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agendar Cita - LorenaBraids</title>
+    <link rel="stylesheet" href="/css/output.css" />
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+    />
+  </head>
+  <body
+    class="bg-gradient-to-br from-amber-50 via-white to-orange-50 min-h-screen"
+  >
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-white shadow-sm">
+      <nav class="container mx-auto px-6 py-4">
+        <div class="flex justify-between items-center">
+          <!-- Logo -->
+          <a href="/" class="cursor-pointer">
+            <img
+              src="/images/logo.png"
+              alt="LorenaBraids"
+              class="h-12 w-auto hover:opacity-80 transition"
+            />
+          </a>
+
+          <!-- Back Button -->
+          <a
+            href="/"
+            class="text-gray-700 hover:text-amber-600 transition font-medium flex items-center gap-2"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            Volver
+          </a>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-12">
+      <div class="max-w-3xl mx-auto">
+        <!-- Header Section -->
+        <div class="text-center mb-10">
+          <div class="inline-block mb-4">
+            <span class="text-5xl">📅</span>
+          </div>
+          <h1 class="text-5xl md:text-6xl font-bold mb-4">
+            <span class="text-gray-800">Agenda tu</span>
+            <span class="text-amber-600"> Cita</span>
+          </h1>
+          <div
+            class="w-24 h-1 bg-gradient-to-r from-amber-400 to-amber-600 mx-auto rounded-full mb-4"
+          ></div>
+          <p class="text-gray-600 text-lg max-w-2xl mx-auto">
+            Completa el formulario y nos pondremos en contacto contigo para
+            confirmar tu cita
+          </p>
+        </div>
+
+        <!-- Form Card -->
+        <div
+          class="bg-white rounded-2xl shadow-lg p-8 md:p-10 border border-gray-100"
+        >
+          <!-- Saludo personalizado (solo si está logueado) -->
+          <div
+            id="userGreeting"
+            class="hidden mb-6 pb-6 border-b border-gray-200"
+          >
+            <div class="flex items-center gap-3">
+              <div
+                class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center"
+              >
+                <svg
+                  class="w-6 h-6 text-amber-600"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div>
+                <p class="text-sm text-gray-600">Agendando cita para:</p>
+                <p
+                  id="userNameGreeting"
+                  class="text-lg font-semibold text-gray-800"
+                ></p>
+              </div>
+            </div>
+          </div>
+
+          <form id="citaForm" class="space-y-6">
+            <!-- Campos para usuarios NO logueados -->
+            <div id="guestFields" class="space-y-6">
+              <!-- Nombre Completo -->
+              <div>
+                <label
+                  for="nombre"
+                  class="block text-sm font-semibold text-gray-700 mb-2"
+                >
+                  Nombre Completo
+                  <span class="text-amber-600">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="nombre"
+                  name="nombre"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition"
+                  placeholder="Ej: María González"
+                />
+              </div>
+
+              <!-- Email y Teléfono en 2 columnas -->
+              <div class="grid md:grid-cols-2 gap-6">
+                <!-- Email -->
+                <div>
+                  <label
+                    for="email"
+                    class="block text-sm font-semibold text-gray-700 mb-2"
+                  >
+                    Correo Electrónico
+                    <span class="text-amber-600">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition"
+                    placeholder="tu@email.com"
+                  />
+                </div>
+
+                <!-- Teléfono -->
+                <div>
+                  <label
+                    for="telefono"
+                    class="block text-sm font-semibold text-gray-700 mb-2"
+                  >
+                    Teléfono
+                    <span class="text-amber-600">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    id="telefono"
+                    name="telefono"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition"
+                    placeholder="+56 9 1234 5678"
+                  />
+                </div>
+              </div>
+
+              <!-- Sugerencia de login -->
+              <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div class="flex gap-3">
+                  <svg
+                    class="w-5 h-5 text-blue-600 shrink-0 mt-0.5"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                  <div class="text-sm">
+                    <p class="font-semibold text-blue-900 mb-1">
+                      💡 ¿Ya tienes cuenta?
+                    </p>
+                    <p class="text-blue-800">
+                      <a href="/login" class="underline hover:text-blue-600"
+                        >Inicia sesión</a
+                      >
+                      para agendar más rápido sin llenar estos datos.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Servicio -->
+            <div>
+              <label
+                for="servicio"
+                class="block text-sm font-semibold text-gray-700 mb-2"
+              >
+                Tipo de Servicio
+                <span class="text-amber-600">*</span>
+              </label>
+              <select
+                id="servicio"
+                name="servicio"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition bg-white"
+              >
+                <option value="">Selecciona un servicio</option>
+              </select>
+            </div>
+
+            <!-- Fecha y Hora en 2 columnas -->
+            <div class="grid md:grid-cols-2 gap-6">
+              <!-- Fecha -->
+              <div>
+                <label
+                  for="fecha"
+                  class="block text-sm font-semibold text-gray-700 mb-2"
+                >
+                  Fecha Preferida
+                  <span class="text-amber-600">*</span>
+                </label>
+                <input
+                  type="date"
+                  id="fecha"
+                  name="fecha"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition"
+                />
+              </div>
+
+              <!-- Hora -->
+              <div>
+                <label
+                  for="hora"
+                  class="block text-sm font-semibold text-gray-700 mb-2"
+                >
+                  Hora Preferida
+                  <span class="text-amber-600">*</span>
+                </label>
+                <select
+                  id="hora"
+                  name="hora"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition bg-white"
+                >
+                  <option value="">Selecciona una hora</option>
+                  <option value="09:00">09:00 AM</option>
+                  <option value="10:00">10:00 AM</option>
+                  <option value="11:00">11:00 AM</option>
+                  <option value="12:00">12:00 PM</option>
+                  <option value="13:00">01:00 PM</option>
+                  <option value="14:00">02:00 PM</option>
+                  <option value="15:00">03:00 PM</option>
+                  <option value="16:00">04:00 PM</option>
+                  <option value="17:00">05:00 PM</option>
+                  <option value="18:00">06:00 PM</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Notas / Referencias -->
+            <div>
+              <label
+                for="notas"
+                class="block text-sm font-semibold text-gray-700 mb-2"
+              >
+                Notas o Referencias del Trenzado
+              </label>
+              <textarea
+                id="notas"
+                name="notas"
+                rows="5"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition resize-none"
+                placeholder="Describe el estilo que deseas, comparte referencias, largo del cabello, color de extensiones, etc."
+              ></textarea>
+              <p class="text-sm text-gray-500 mt-2">
+                💡 Tip: Puedes mencionar fotos de referencia que nos enviarás
+                por WhatsApp
+              </p>
+            </div>
+
+            <!-- Divider -->
+            <div class="border-t border-gray-200 my-6"></div>
+
+            <!-- Botones -->
+            <div class="flex flex-col sm:flex-row gap-4">
+              <button
+                type="submit"
+                class="flex-1 bg-amber-600 text-white py-4 rounded-lg hover:bg-amber-700 transition font-semibold shadow-md hover:shadow-lg"
+              >
+                Enviar Solicitud
+              </button>
+              <button
+                type="button"
+                id="cancelBtn"
+                class="flex-1 sm:flex-none sm:px-8 border-2 border-gray-300 text-gray-700 py-4 rounded-lg hover:bg-gray-50 transition font-semibold"
+              >
+                Limpiar Formulario
+              </button>
+            </div>
+
+            <!-- Info adicional -->
+            <div
+              class="bg-amber-50 border border-amber-200 rounded-lg p-4 mt-6"
+            >
+              <div class="flex gap-3">
+                <svg
+                  class="w-6 h-6 text-amber-600 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                <div class="text-sm text-gray-700">
+                  <p class="font-semibold mb-1">📅 Confirmación de Cita</p>
+                  <p>
+                    Te contactaremos en las próximas 24 horas para confirmar la
+                    disponibilidad y detalles de tu cita.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Información de Contacto -->
+        <div class="mt-10 text-center">
+          <p class="text-gray-600 mb-4">¿Prefieres agendar por WhatsApp?</p>
+          <a
+            href="https://wa.me/56995162998"
+            target="_blank"
+            class="inline-flex items-center gap-2 bg-green-500 text-white px-6 py-3 rounded-full hover:bg-green-600 transition font-medium shadow-md"
+          >
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"
+              />
+            </svg>
+            Contactar por WhatsApp
+          </a>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-16">
+      <div class="container mx-auto px-6 py-8 text-center text-gray-600">
+        <p>&copy; 2024 LorenaBraids. Todos los derechos reservados.</p>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/citas.js"></script>
+  </body>
+</html>
