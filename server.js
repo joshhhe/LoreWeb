@@ -122,12 +122,16 @@ app.use((req, res) => {
 app.listen(PORT, async () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 
+  // Debug: mostrar si la variable DATABASE_URL está presente (no imprimir el valor)
+  console.log("DEBUG: DATABASE_URL set?", !!process.env.DATABASE_URL);
+  console.log("DEBUG: NODE_ENV=", process.env.NODE_ENV || "(not set)");
+
   // Probar conexión a PostgreSQL
   try {
     const result = await pool.query("SELECT NOW()");
     console.log("✅ Conectado a PostgreSQL");
   } catch (error) {
-    console.error("❌ Error conectando a PostgreSQL:", error.message);
+    console.error("❌ Error conectando a PostgreSQL:", error);
   }
 });
 
