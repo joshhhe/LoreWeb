@@ -132,7 +132,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // Close when clicking outside
     document.addEventListener("click", (e) => {
       if (window.innerWidth >= 768) return;
-      if (!mainNav.classList.contains("hidden") && !mainNav.contains(e.target) && e.target !== mobileBtn && !mobileBtn.contains(e.target)) {
+      if (
+        !mainNav.classList.contains("hidden") &&
+        !mainNav.contains(e.target) &&
+        e.target !== mobileBtn &&
+        !mobileBtn.contains(e.target)
+      ) {
         hideMenu();
       }
     });
