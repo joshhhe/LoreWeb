@@ -87,43 +87,61 @@ document.addEventListener("DOMContentLoaded", () => {
   // Verificar sesión al cargar la página
   verificarSesion();
 
-  // Mobile menu toggle
+  // Mobile menu toggle (opens aligned to the hamburger button on the right)
   const mobileBtn = document.getElementById("mobileMenuBtn");
   const mainNav = document.getElementById("mainNav");
   if (mobileBtn && mainNav) {
-    mobileBtn.addEventListener("click", () => {
-      // Toggle visibility on small screens
-      mainNav.classList.toggle("hidden");
-      // Ensure it displays vertically on mobile when visible
-      if (!mainNav.classList.contains("hidden")) {
-        mainNav.classList.add(
-          "flex",
-          "flex-col",
-          "gap-4",
-          "p-4",
-          "absolute",
-          "left-0",
-          "right-0",
-          "top-full",
-          "bg-white",
-          "shadow-md",
-          "z-50",
-        );
-      } else {
-        mainNav.classList.remove(
-          "flex",
-          "flex-col",
-          "gap-4",
-          "p-4",
-          "absolute",
-          "left-0",
-          "right-0",
-          "top-full",
-          "bg-white",
-          "shadow-md",
-          "z-50",
-        );
+    // Accessibility attributes
+    mobileBtn.setAttribute("aria-expanded", "false");
+    mobileBtn.setAttribute("aria-controls", "mainNav");
+
+    const showClasses = [
+      "flex",
+      "flex-col",
+      "gap-4",
+      "p-4",
+      "absolute",
+      "top-full",
+      "right-4",
+      "w-48",
+      "bg-white",
+      "shadow-md",
+      "rounded",
+      "z-50",
+    ];
+
+    const hideMenu = () => {
+      mainNav.classList.add("hidden");
+      mainNav.classList.remove(...showClasses);
+      mobileBtn.setAttribute("aria-expanded", "false");
+    };
+
+    const openMenu = () => {
+      mainNav.classList.remove("hidden");
+      mainNav.classList.add(...showClasses);
+      mobileBtn.setAttribute("aria-expanded", "true");
+    };
+
+    mobileBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (window.innerWidth >= 768) return; // only on small screens
+      if (mainNav.classList.contains("hidden")) openMenu();
+      else hideMenu();
+    });
+
+    // Close when clicking outside
+    document.addEventListener("click", (e) => {
+      if (window.innerWidth >= 768) return;
+      if (!mainNav.classList.contains("hidden") && !mainNav.contains(e.target) && e.target !== mobileBtn && !mobileBtn.contains(e.target)) {
+        hideMenu();
       }
+    });
+
+    // Close when a nav link is clicked (mobile)
+    mainNav.querySelectorAll("a").forEach((a) => {
+      a.addEventListener("click", () => {
+        if (window.innerWidth < 768) hideMenu();
+      });
     });
   }
 });
