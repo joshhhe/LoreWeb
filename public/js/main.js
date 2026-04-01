@@ -86,4 +86,44 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Verificar sesión al cargar la página
   verificarSesion();
+
+  // Mobile menu toggle
+  const mobileBtn = document.getElementById("mobileMenuBtn");
+  const mainNav = document.getElementById("mainNav");
+  if (mobileBtn && mainNav) {
+    mobileBtn.addEventListener("click", () => {
+      // Toggle visibility on small screens
+      mainNav.classList.toggle("hidden");
+      // Ensure it displays vertically on mobile when visible
+      if (!mainNav.classList.contains("hidden")) {
+        mainNav.classList.add(
+          "flex",
+          "flex-col",
+          "gap-4",
+          "p-4",
+          "absolute",
+          "left-0",
+          "right-0",
+          "top-full",
+          "bg-white",
+          "shadow-md",
+          "z-50",
+        );
+      } else {
+        mainNav.classList.remove(
+          "flex",
+          "flex-col",
+          "gap-4",
+          "p-4",
+          "absolute",
+          "left-0",
+          "right-0",
+          "top-full",
+          "bg-white",
+          "shadow-md",
+          "z-50",
+        );
+      }
+    });
+  }
 });
