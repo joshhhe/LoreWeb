@@ -65,15 +65,11 @@ const createOrder = async (req, res) => {
         items,
         external_reference: String(ordenId),
         back_urls: {
-          success:
-            "https://proportioned-unantagonised-rhona.ngrok-free.dev/productos?status=success",
-          failure:
-            "https://proportioned-unantagonised-rhona.ngrok-free.dev/productos?status=failure",
-          pending:
-            "https://proportioned-unantagonised-rhona.ngrok-free.dev/productos?status=pending",
+          success: "https://loreweb.onrender.com/productos?status=success",
+          failure: "https://loreweb.onrender.com/productos?status=failure",
+          pending: "https://loreweb.onrender.com/productos?status=pending",
         },
-        notification_url:
-          "https://proportioned-unantagonised-rhona.ngrok-free.dev/api/pagos/webhook",
+        notification_url: "https://loreweb.onrender.com/api/pagos/webhook",
       },
     });
 
