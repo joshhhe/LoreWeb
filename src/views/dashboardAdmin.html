@@ -1,10 +1,57 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Dashboard - LoreWeb</title>
     <link rel="stylesheet" href="/css/output.css" />
+    <style>
+      /* Responsive tables for mobile */
+      @media (max-width: 768px) {
+        table thead {
+          display: none;
+        }
+
+        table,
+        table tbody,
+        table tr,
+        table td {
+          display: block;
+          width: 100%;
+        }
+
+        table tr {
+          margin-bottom: 1rem;
+          border: 1px solid #e5e7eb;
+          border-radius: 0.5rem;
+          padding: 0.75rem;
+          background: white;
+        }
+
+        table td {
+          text-align: right;
+          padding: 0.5rem 0;
+          border: none;
+          position: relative;
+          padding-left: 50%;
+        }
+
+        table td:before {
+          content: attr(data-label);
+          position: absolute;
+          left: 0;
+          width: 45%;
+          padding-left: 0.5rem;
+          font-weight: 600;
+          text-align: left;
+          color: #6b7280;
+        }
+
+        table td:last-child {
+          border-bottom: 0;
+        }
+      }
+    </style>
   </head>
   <body class="bg-gray-50 min-h-screen text-gray-700">
     <!-- Header -->
@@ -51,6 +98,76 @@
     </header>
 
     <main class="container mx-auto px-6 py-8">
+      <!-- Business Summary Cards -->
+      <section class="mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-gray-800">
+            Resumen del negocio
+          </h2>
+          <span class="text-xs text-gray-500">Actualización automática</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          <article
+            class="bg-white rounded-xl shadow p-4 border border-gray-100 hover:shadow-md transition"
+          >
+            <p class="text-xs uppercase tracking-wide text-gray-500">
+              Ingresos mes
+            </p>
+            <p
+              id="kpiRevenueMonth"
+              class="text-2xl font-bold text-gray-800 mt-2"
+            >
+              $0
+            </p>
+            <p class="text-xs text-gray-500 mt-1">
+              Basado en citas confirmadas/completadas
+            </p>
+          </article>
+
+          <article
+            class="bg-white rounded-xl shadow p-4 border border-gray-100 hover:shadow-md transition"
+          >
+            <p class="text-xs uppercase tracking-wide text-gray-500">
+              Citas pendientes
+            </p>
+            <p
+              id="kpiPendingAppointments"
+              class="text-2xl font-bold text-amber-700 mt-2"
+            >
+              0
+            </p>
+            <p class="text-xs text-gray-500 mt-1">Por confirmar o rechazar</p>
+          </article>
+
+          <article
+            class="bg-white rounded-xl shadow p-4 border border-gray-100 hover:shadow-md transition"
+          >
+            <p class="text-xs uppercase tracking-wide text-gray-500">
+              Productos con stock bajo
+            </p>
+            <p id="kpiLowStock" class="text-2xl font-bold text-red-600 mt-2">
+              0
+            </p>
+            <p class="text-xs text-gray-500 mt-1">Menor o igual a 5 unidades</p>
+          </article>
+
+          <article
+            class="bg-white rounded-xl shadow p-4 border border-gray-100 hover:shadow-md transition"
+          >
+            <p class="text-xs uppercase tracking-wide text-gray-500">
+              Servicio más solicitado
+            </p>
+            <p id="kpiTopService" class="text-lg font-bold text-gray-800 mt-2">
+              Sin datos
+            </p>
+            <p id="kpiTopServiceCount" class="text-xs text-gray-500 mt-1">
+              0 citas
+            </p>
+          </article>
+        </div>
+      </section>
+
       <div class="flex flex-col lg:flex-row gap-6">
         <!-- Left column: Services & Products CRUD -->
         <section class="flex-1 space-y-6">
@@ -105,7 +222,6 @@
                     <th class="pb-2">Stock</th>
                     <th class="pb-2">Descripción</th>
                     <th class="pb-2">Precio</th>
-                    <th class="pb-2">Categoria</th>
                     <th class="pb-2">Acciones</th>
                   </tr>
                 </thead>
@@ -121,6 +237,27 @@
             <h3 class="text-lg font-semibold mb-4">Agenda (próximas citas)</h3>
             <div class="space-y-3">
               <ul id="appointmentsList" class="divide-y"></ul>
+            </div>
+            <!-- Pagination Controls -->
+            <div
+              id="paginationControls"
+              class="mt-4 flex items-center justify-between text-sm"
+            >
+              <button
+                id="prevPage"
+                class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled
+              >
+                ← Anterior
+              </button>
+              <span id="pageInfo" class="text-gray-600">Página 1 de 1</span>
+              <button
+                id="nextPage"
+                class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled
+              >
+                Siguiente →
+              </button>
             </div>
           </div>
         </aside>

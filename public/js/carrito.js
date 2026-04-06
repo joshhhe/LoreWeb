@@ -184,6 +184,7 @@ function formatCLP(value) {
   }).format(Number(value) || 0);
 }
 
+//boton de checkout
 btnCheckOut.addEventListener("click", async () => {
   const banderaCarrito = validarCarrito();
   if (!banderaCarrito) return;
@@ -227,6 +228,7 @@ btnCheckOut.addEventListener("click", async () => {
       console.log("Respuesta backend:", data);
       if (response.ok) {
         //window.location.href = data.result.init_point;
+        console.log(data);
       }
     } catch (error) {
       btnCheckOut.disabled = false;

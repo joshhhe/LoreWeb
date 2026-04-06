@@ -1,4 +1,5 @@
 const { MercadoPagoConfig, Preference } = require("mercadopago");
+const crypto = require("crypto");
 const pagoModel = require("../models/pagoModel");
 
 const createOrder = async (req, res) => {
@@ -105,30 +106,167 @@ const createOrder = async (req, res) => {
   }
 };
 
+function parseXSignature(signatureHeader) {
+  if (!signatureHeader || typeof signatureHeader !== "string") {
+    return {};
+  }
+
+  return signatureHeader
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .reduce((acc, part) => {
+      const [key, value] = part.split("=");
+      if (key && value) {
+        acc[key.trim()] = value.trim();
+      }
+      return acc;
+    }, {});
+}
+
+function safeCompareHex(expected, received) {
+  if (!expected || !received) return false;
+
+  try {
+    const expectedBuffer = Buffer.from(expected, "hex");
+    const receivedBuffer = Buffer.from(received, "hex");
+
+    if (expectedBuffer.length !== receivedBuffer.length) {
+      return false;
+    }
+
+    return crypto.timingSafeEqual(expectedBuffer, receivedBuffer);
+  } catch (error) {
+    return false;
+  }
+}
+
+function isFreshTimestamp(ts) {
+  const tsNumber = Number(ts);
+  if (!Number.isFinite(tsNumber) || tsNumber <= 0) return false;
+
+  // Mercado Pago envía timestamp en segundos en x-signature
+  const tsMs = tsNumber * 1000;
+  const maxSkewMs = 5 * 60 * 1000;
+
+  return Math.abs(Date.now() - tsMs) <= maxSkewMs;
+}
+
+function verificarFirmaWebhookMercadoPago(req, paymentId) {
+  const secret = process.env.MERCADO_PAGO_WEBHOOK_SECRET;
+  if (!secret) {
+    console.error("MERCADO_PAGO_WEBHOOK_SECRET no está configurado");
+    return false;
+  }
+
+  const signatureHeader = req.headers["x-signature"];
+  const requestId = req.headers["x-request-id"];
+
+  if (!signatureHeader || !requestId) {
+    return false;
+  }
+
+  const parsedSignature = parseXSignature(signatureHeader);
+  const ts = parsedSignature.ts;
+  const v1 = parsedSignature.v1;
+
+  if (!ts || !v1) {
+    return false;
+  }
+
+  if (!isFreshTimestamp(ts)) {
+    return false;
+  }
+
+  const manifest = `id:${paymentId};request-id:${requestId};ts:${ts};`;
+  const generatedV1 = crypto
+    .createHmac("sha256", secret)
+    .update(manifest)
+    .digest("hex");
+
+  return safeCompareHex(generatedV1, v1);
+}
+
 const webhook = async (req, res) => {
-  console.log("Webhook Mercado Pago recibido:");
-  console.log(req.query);
-  console.log(req.body);
-  const paymentId = req.query["data.id"] || req.body?.data?.id;
-  if (paymentId) {
+  try {
+    console.log("Webhook Mercado Pago recibido:");
+    console.log(req.query);
+    console.log(req.body);
+
+    const paymentId = req.query["data.id"] || req.body?.data?.id;
+    if (!paymentId) {
+      return res.status(200).send("Webhook recibido sin paymentId");
+    }
+
+    const firmaValida = verificarFirmaWebhookMercadoPago(
+      req,
+      String(paymentId),
+    );
+
+    if (!firmaValida) {
+      return res.status(401).json({
+        success: false,
+        message: "Firma de webhook inválida",
+      });
+    }
+
     const pago = await consultarPago(paymentId);
+    if (!pago) {
+      return res.status(200).send("Webhook recibido, pago no disponible");
+    }
+
     const idOrden = pago?.external_reference
       ? Number(pago.external_reference)
       : null;
+
     const estadoMap = {
       approved: "pagado",
       pending: "pendiente",
       rejected: "cancelado",
     };
-    const nuevoEstado = pago?.status ? estadoMap[pago.status] : null;
-    if (idOrden && nuevoEstado) {
-      const response = await pagoModel.updateOrdenEstado(idOrden, nuevoEstado);
-      console.log("Orden actualizada:", response);
-    }
-  }
-  //  guardaenbasedeDatos();
 
-  res.send("Webhook recibido");
+    const nuevoEstado = pago?.status ? estadoMap[pago.status] : null;
+
+    if (!idOrden || !nuevoEstado) {
+      return res
+        .status(200)
+        .send("Webhook recibido, sin datos para actualizar");
+    }
+
+    const ordenActual = await pagoModel.getOrdenById(idOrden);
+
+    if (!ordenActual) {
+      return res.status(200).send("Webhook recibido, orden no encontrada");
+    }
+
+    // Idempotencia: si ya está en el mismo estado, no reprocesar
+    if (ordenActual.estado === nuevoEstado) {
+      console.log(
+        `Webhook duplicado ignorado para orden ${idOrden} (estado: ${nuevoEstado})`,
+      );
+      return res.status(200).send("Webhook duplicado, sin cambios");
+    }
+
+    // Evitar degradar el estado cuando ya está pagado
+    if (ordenActual.estado === "pagado" && nuevoEstado !== "pagado") {
+      console.log(
+        `Transición ignorada para orden ${idOrden}: ${ordenActual.estado} -> ${nuevoEstado}`,
+      );
+      return res.status(200).send("Webhook recibido, transición ignorada");
+    }
+
+    const response = await pagoModel.updateOrdenEstado(idOrden, nuevoEstado);
+    console.log("Orden actualizada:", response);
+
+    return res.status(200).send("Webhook procesado");
+  } catch (error) {
+    console.error("❌ Error procesando webhook:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error procesando webhook",
+      error: error?.message || error,
+    });
+  }
 };
 
 async function consultarPago(paymentId) {

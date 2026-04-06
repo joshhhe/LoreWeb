@@ -101,16 +101,23 @@ citaForm.addEventListener("submit", async (e) => {
   const horaCita = document.getElementById("hora").value;
   const notasCita = document.getElementById("notas").value;
 
-  // Validar que la fecha no sea pasada
-  const fechaSeleccionada = new Date(fechaCita);
-  const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0); // Resetear horas para comparar solo fechas
+  // Validar que la fecha y hora no sean pasadas
+  const ahora = new Date();
 
-  if (fechaSeleccionada < hoy) {
+  // Separar fecha y hora
+  const [year, month, day] = fechaCita.split("-").map(Number);
+  const [hours, minutes] = horaCita.split(":").map(Number);
+
+  // Crear fecha seleccionada
+  const fechaSeleccionada = new Date(year, month - 1, day, hours, minutes);
+  console.log("📅 Fecha seleccionada:", fechaSeleccionada);
+  console.log("📅 Fecha actual:", ahora);
+
+  if (fechaSeleccionada <= ahora) {
     Swal.fire({
       icon: "error",
-      title: "No puedes seleccionar una fecha pasada",
-      text: "Por favor selecciona una fecha válida",
+      title: "No puedes seleccionar una fecha u hora pasada",
+      text: "Por favor selecciona una fecha y hora válida en el futuro",
       confirmButtonColor: "#d97706",
       customClass: {
         popup: "rounded-xl",

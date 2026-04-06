@@ -5,6 +5,17 @@ const serviceForm = document.getElementById("serviceForm");
 const productForm = document.getElementById("productForm");
 const logOutBtn = document.getElementById("logoutBtn");
 
+// Variables para paginación de citas
+let todasLasCitas = [];
+let paginaActual = 1;
+const citasPorPagina = 5;
+
+// Estado para cards KPI
+const dashboardMetrics = {
+  productos: [],
+  citas: [],
+};
+
 // Event listeners para cerrar modales
 document.getElementById("closeServiceModal").addEventListener("click", () => {
   closeModal("serviceModal");
@@ -135,6 +146,87 @@ function formatearPrecio(precio) {
   }).format(precio);
 }
 
+function parsearNumero(valor) {
+  if (typeof valor === "number") return valor;
+  if (typeof valor === "string") {
+    const normalizado = valor.replace(/[^\d.-]/g, "");
+    return Number(normalizado || 0);
+  }
+  return 0;
+}
+
+function actualizarCardsResumen() {
+  const ahora = new Date();
+  const mesActual = ahora.getMonth();
+  const anioActual = ahora.getFullYear();
+
+  const citasMes = dashboardMetrics.citas.filter((cita) => {
+    const fecha = new Date(cita.fecha_cita);
+    return (
+      fecha.getMonth() === mesActual &&
+      fecha.getFullYear() === anioActual &&
+      (cita.estado === "confirmada" || cita.estado === "completada")
+    );
+  });
+
+  const ingresosMes = citasMes.reduce(
+    (acc, cita) => acc + parsearNumero(cita.precio),
+    0,
+  );
+
+  const citasPendientes = dashboardMetrics.citas.filter(
+    (cita) => cita.estado === "pendiente",
+  ).length;
+
+  const stockBajo = dashboardMetrics.productos.filter(
+    (producto) => Number(producto.stock) <= 5,
+  ).length;
+
+  const serviciosContador = dashboardMetrics.citas.reduce((acc, cita) => {
+    const nombreServicio = cita.nombre_servicio || "Sin nombre";
+    acc[nombreServicio] = (acc[nombreServicio] || 0) + 1;
+    return acc;
+  }, {});
+
+  let servicioTop = "Sin datos";
+  let servicioTopCantidad = 0;
+
+  Object.entries(serviciosContador).forEach(([nombre, cantidad]) => {
+    if (cantidad > servicioTopCantidad) {
+      servicioTop = nombre;
+      servicioTopCantidad = cantidad;
+    }
+  });
+
+  const revenueMonthEl = document.getElementById("kpiRevenueMonth");
+  const pendingAppointmentsEl = document.getElementById(
+    "kpiPendingAppointments",
+  );
+  const lowStockEl = document.getElementById("kpiLowStock");
+  const topServiceEl = document.getElementById("kpiTopService");
+  const topServiceCountEl = document.getElementById("kpiTopServiceCount");
+
+  if (revenueMonthEl) {
+    revenueMonthEl.textContent = formatearPrecio(ingresosMes);
+  }
+
+  if (pendingAppointmentsEl) {
+    pendingAppointmentsEl.textContent = String(citasPendientes);
+  }
+
+  if (lowStockEl) {
+    lowStockEl.textContent = String(stockBajo);
+  }
+
+  if (topServiceEl) {
+    topServiceEl.textContent = servicioTop;
+  }
+
+  if (topServiceCountEl) {
+    topServiceCountEl.textContent = `${servicioTopCantidad} citas`;
+  }
+}
+
 //actualizar servicio
 async function cargarServicios() {
   try {
@@ -157,14 +249,17 @@ async function cargarServicios() {
       // Crear celdas de datos
       const celdaNombre = document.createElement("td");
       celdaNombre.className = "py-3";
+      celdaNombre.setAttribute("data-label", "Nombre");
       celdaNombre.textContent = servicio.nombre;
 
       const celdaDuracion = document.createElement("td");
       celdaDuracion.className = "py-3";
+      celdaDuracion.setAttribute("data-label", "Duración");
       celdaDuracion.textContent = `${servicio.duracion_minutos}min`;
 
       const celdaPrecio = document.createElement("td");
       celdaPrecio.className = "py-3";
+      celdaPrecio.setAttribute("data-label", "Precio");
       celdaPrecio.textContent = formatearPrecio(servicio.precio);
 
       fila.appendChild(celdaNombre);
@@ -173,6 +268,7 @@ async function cargarServicios() {
       // Crear celda de acciones
       const celdaAcciones = document.createElement("td");
       celdaAcciones.className = "py-3";
+      celdaAcciones.setAttribute("data-label", "Acciones");
 
       // Crear botón eliminar
       const btnEliminar = document.createElement("button");
@@ -387,61 +483,90 @@ async function cargarCitas() {
       throw new Error(data.message || "Error al cargar citas");
     }
 
-    const appointmentsList = document.getElementById("appointmentsList");
-    appointmentsList.innerHTML = "";
-
     console.log("Citas recibidas:", data.citas);
 
     // Verificar si hay citas
     if (!data.citas || data.citas.length === 0) {
+      const appointmentsList = document.getElementById("appointmentsList");
       appointmentsList.innerHTML = `
         <li class="py-4 text-center text-gray-500 text-sm">
           No hay citas registradas
         </li>
       `;
+      todasLasCitas = [];
+      dashboardMetrics.citas = [];
+      actualizarCardsResumen();
+      document.getElementById("paginationControls").style.display = "none";
       return;
     }
 
-    // Renderizar cada cita
-    data.citas.forEach((cita) => {
-      const citaElement = document.createElement("li");
-      citaElement.className =
-        "py-3 hover:bg-gray-50 px-3 rounded-lg transition";
+    // Guardar todas las citas y mostrar la página actual
+    todasLasCitas = data.citas;
+    dashboardMetrics.citas = data.citas;
+    actualizarCardsResumen();
+    mostrarPaginaCitas();
+  } catch (error) {
+    const appointmentsList = document.getElementById("appointmentsList");
+    appointmentsList.innerHTML = `
+      <li class="py-4 text-center text-red-500 text-sm">
+        Error al cargar citas: ${error.message}
+      </li>
+    `;
+    todasLasCitas = [];
+    dashboardMetrics.citas = [];
+    actualizarCardsResumen();
+  }
+}
 
-      // Formatear fecha y hora
-      const fecha = new Date(cita.fecha_cita).toLocaleDateString("es-ES", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      });
+// Función para mostrar citas de la página actual
+function mostrarPaginaCitas() {
+  const appointmentsList = document.getElementById("appointmentsList");
+  appointmentsList.innerHTML = "";
 
-      // Badge de estado
-      let estadoBadge = "";
-      let estadoColor = "";
+  // Calcular índices de inicio y fin
+  const inicio = (paginaActual - 1) * citasPorPagina;
+  const fin = inicio + citasPorPagina;
+  const citasPagina = todasLasCitas.slice(inicio, fin);
 
-      switch (cita.estado) {
-        case "pendiente":
-          estadoColor = "bg-yellow-100 text-yellow-700";
-          estadoBadge = "Pendiente";
-          break;
-        case "confirmada":
-          estadoColor = "bg-green-100 text-green-700";
-          estadoBadge = "Confirmada";
-          break;
-        case "completada":
-          estadoColor = "bg-blue-100 text-blue-700";
-          estadoBadge = "Completada";
-          break;
-        case "cancelada":
-          estadoColor = "bg-red-100 text-red-700";
-          estadoBadge = "Cancelada";
-          break;
-        default:
-          estadoColor = "bg-gray-100 text-gray-700";
-          estadoBadge = cita.estado;
-      }
+  // Renderizar cada cita
+  citasPagina.forEach((cita) => {
+    const citaElement = document.createElement("li");
+    citaElement.className = "py-3 hover:bg-gray-50 px-3 rounded-lg transition";
 
-      citaElement.innerHTML = `
+    // Formatear fecha y hora
+    const fecha = new Date(cita.fecha_cita).toLocaleDateString("es-ES", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+
+    // Badge de estado
+    let estadoBadge = "";
+    let estadoColor = "";
+
+    switch (cita.estado) {
+      case "pendiente":
+        estadoColor = "bg-yellow-100 text-yellow-700";
+        estadoBadge = "Pendiente";
+        break;
+      case "confirmada":
+        estadoColor = "bg-green-100 text-green-700";
+        estadoBadge = "Confirmada";
+        break;
+      case "completada":
+        estadoColor = "bg-blue-100 text-blue-700";
+        estadoBadge = "Completada";
+        break;
+      case "cancelada":
+        estadoColor = "bg-red-100 text-red-700";
+        estadoBadge = "Cancelada";
+        break;
+      default:
+        estadoColor = "bg-gray-100 text-gray-700";
+        estadoBadge = cita.estado;
+    }
+
+    citaElement.innerHTML = `
         <div class="space-y-3">
           <div class="flex justify-between items-start">
             <div class="flex-1">
@@ -497,16 +622,34 @@ async function cargarCitas() {
         </div>
       `;
 
-      appointmentsList.appendChild(citaElement);
-    });
-  } catch (error) {
-    const appointmentsList = document.getElementById("appointmentsList");
-    appointmentsList.innerHTML = `
-      <li class="py-4 text-center text-red-500 text-sm">
-        Error al cargar citas: ${error.message}
-      </li>
-    `;
+    appointmentsList.appendChild(citaElement);
+  });
+
+  // Actualizar controles de paginación
+  actualizarControlesPaginacion();
+}
+
+// Función para actualizar controles de paginación
+function actualizarControlesPaginacion() {
+  const totalPaginas = Math.ceil(todasLasCitas.length / citasPorPagina);
+  const prevBtn = document.getElementById("prevPage");
+  const nextBtn = document.getElementById("nextPage");
+  const pageInfo = document.getElementById("pageInfo");
+
+  // Mostrar controles solo si hay más de una página
+  if (totalPaginas <= 1) {
+    document.getElementById("paginationControls").style.display = "none";
+    return;
   }
+
+  document.getElementById("paginationControls").style.display = "flex";
+
+  // Actualizar información de página
+  pageInfo.textContent = `Página ${paginaActual} de ${totalPaginas}`;
+
+  // Habilitar/deshabilitar botones
+  prevBtn.disabled = paginaActual === 1;
+  nextBtn.disabled = paginaActual === totalPaginas;
 }
 
 //funcion para manejar acciones de citas y cambiar estado
@@ -584,6 +727,7 @@ document.addEventListener("DOMContentLoaded", () => {
   cargarProductos();
   cargarCitas();
 
+  // Event listener para citas (confirmar/rechazar)
   document
     .getElementById("appointmentsList")
     .addEventListener("click", async (e) => {
@@ -599,6 +743,22 @@ document.addEventListener("DOMContentLoaded", () => {
         await cargarCitas();
       }
     });
+
+  // Event listeners para paginación
+  document.getElementById("prevPage").addEventListener("click", () => {
+    if (paginaActual > 1) {
+      paginaActual--;
+      mostrarPaginaCitas();
+    }
+  });
+
+  document.getElementById("nextPage").addEventListener("click", () => {
+    const totalPaginas = Math.ceil(todasLasCitas.length / citasPorPagina);
+    if (paginaActual < totalPaginas) {
+      paginaActual++;
+      mostrarPaginaCitas();
+    }
+  });
 });
 
 //Haremos el fetch para la parte de productos
@@ -889,38 +1049,40 @@ async function cargarProductos() {
     const data = await productos.json();
     const tablaProductos = document.getElementById("productsTbody");
     tablaProductos.innerHTML = "";
+    dashboardMetrics.productos = data.productos || [];
+    actualizarCardsResumen();
 
     data.productos.forEach((producto) => {
       const fila = document.createElement("tr");
 
       const celdaNombre = document.createElement("td");
       celdaNombre.className = "py-3";
+      celdaNombre.setAttribute("data-label", "Nombre");
       celdaNombre.textContent = producto.nombre;
 
       const celdaStock = document.createElement("td");
       celdaStock.className = "py-3";
+      celdaStock.setAttribute("data-label", "Stock");
       celdaStock.textContent = producto.stock;
 
       const celdaDescripcion = document.createElement("td");
       celdaDescripcion.className = "py-3";
+      celdaDescripcion.setAttribute("data-label", "Descripción");
       celdaDescripcion.textContent = producto.descripcion;
 
       const celdaPrecio = document.createElement("td");
       celdaPrecio.className = "py-3";
+      celdaPrecio.setAttribute("data-label", "Precio");
       celdaPrecio.textContent = formatearPrecio(producto.precio);
-
-      const celdaCategoria = document.createElement("td");
-      celdaCategoria.className = "py-3";
-      celdaCategoria.textContent = producto.categoria;
 
       fila.appendChild(celdaNombre);
       fila.appendChild(celdaStock);
       fila.appendChild(celdaDescripcion);
       fila.appendChild(celdaPrecio);
-      fila.appendChild(celdaCategoria);
 
       const celdaAcciones = document.createElement("td");
       celdaAcciones.className = "py-3";
+      celdaAcciones.setAttribute("data-label", "Acciones");
 
       const btnEliminar = document.createElement("button");
       btnEliminar.textContent = "Eliminar";
@@ -946,6 +1108,8 @@ async function cargarProductos() {
       tablaProductos.appendChild(fila);
     });
   } catch (error) {
+    dashboardMetrics.productos = [];
+    actualizarCardsResumen();
     await Swal.fire({
       icon: "error",
       title: "Error de carga",

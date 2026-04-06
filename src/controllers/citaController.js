@@ -72,15 +72,17 @@ const citaController = {
         });
       }
 
-      // 2️⃣ SEGUNDO: Validar que la fecha no sea pasada
-      const fechaCita = new Date(fecha_cita);
-      const hoy = new Date();
-      hoy.setHours(0, 0, 0, 0);
+      // 2️⃣ SEGUNDO: Validar que la fecha y hora no sean pasadas
+      const fechaHoraCita = new Date(fecha_cita + "T" + hora_cita);
+      const ahora = new Date();
 
-      if (fechaCita < hoy) {
+      console.log("📅 Fecha y hora de cita:", fechaHoraCita);
+      console.log("📅 Fecha y hora actual:", ahora);
+
+      if (fechaHoraCita <= ahora) {
         return res.status(400).json({
           success: false,
-          message: "La fecha de la cita no puede ser en el pasado",
+          message: "La fecha y hora de la cita no pueden ser en el pasado",
         });
       }
 

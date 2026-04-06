@@ -87,66 +87,152 @@ document.addEventListener("DOMContentLoaded", () => {
   // Verificar sesión al cargar la página
   verificarSesion();
 
-  // Mobile menu toggle (opens aligned to the hamburger button on the right)
+  // Mobile menu functionality
   const mobileBtn = document.getElementById("mobileMenuBtn");
   const mainNav = document.getElementById("mainNav");
+
   if (mobileBtn && mainNav) {
-    // Accessibility attributes
+    let isMenuOpen = false;
+
+    // Crear overlay para cerrar el menú
+    const overlay = document.createElement("div");
+    overlay.id = "mobileOverlay";
+    overlay.className =
+      "fixed inset-0 bg-black bg-opacity-50 z-40 hidden transition-opacity duration-300";
+    document.body.appendChild(overlay);
+
+    // Configurar atributos de accesibilidad
     mobileBtn.setAttribute("aria-expanded", "false");
     mobileBtn.setAttribute("aria-controls", "mainNav");
 
-    const showClasses = [
-      "flex",
-      "flex-col",
-      "gap-4",
-      "p-4",
-      "absolute",
-      "top-full",
-      "right-4",
-      "w-48",
-      "bg-white",
-      "shadow-md",
-      "rounded",
-      "z-50",
-    ];
+    // Función para abrir el menú
+    function openMenu() {
+      isMenuOpen = true;
 
-    const hideMenu = () => {
-      mainNav.classList.add("hidden");
-      mainNav.classList.remove(...showClasses);
-      mobileBtn.setAttribute("aria-expanded", "false");
-    };
+      // Mostrar overlay
+      overlay.classList.remove("hidden");
+      setTimeout(() => (overlay.style.opacity = "1"), 10);
 
-    const openMenu = () => {
-      mainNav.classList.remove("hidden");
-      mainNav.classList.add(...showClasses);
+      // Obtener la posición del botón para alinear el menú
+      const btnRect = mobileBtn.getBoundingClientRect();
+
+      // Configurar y mostrar menú desde la derecha
+      mainNav.classList.remove("hidden", "md:flex", "gap-8", "items-center");
+      mainNav.classList.add(
+        "flex",
+        "fixed",
+        "w-64",
+        "bg-white",
+        "shadow-2xl",
+        "rounded-lg",
+        "z-50",
+        "flex-col",
+        "gap-2",
+        "py-4",
+        "px-3",
+        "transform",
+        "transition-all",
+        "duration-300",
+      );
+
+      // Posicionar justo debajo del botón hamburguesa, más a la derecha
+      mainNav.style.top = `${btnRect.bottom + 8}px`;
+      mainNav.style.right = `16px`; // Margen fijo de 16px desde el borde derecho
+
+      // Animar entrada desde arriba
+      mainNav.style.opacity = "1";
+      mainNav.style.transform = "translateY(0)";
+
+      // Añadir padding a los elementos li para mejor espaciado
+      mainNav.querySelectorAll("li").forEach((li) => {
+        li.style.padding = "8px 0";
+      });
+
       mobileBtn.setAttribute("aria-expanded", "true");
-    };
+      // Permitir scroll - no bloqueamos el overflow
+    }
 
+    // Función para cerrar el menú
+    function closeMenu() {
+      if (!isMenuOpen) return;
+      isMenuOpen = false;
+
+      // Animar salida hacia arriba
+      mainNav.style.opacity = "0";
+      mainNav.style.transform = "translateY(-10px)";
+      overlay.style.opacity = "0";
+
+      setTimeout(() => {
+        // Restaurar clases originales después de la animación
+        mainNav.classList.add("hidden", "md:flex", "gap-8", "items-center");
+        mainNav.classList.remove(
+          "flex",
+          "fixed",
+          "w-64",
+          "shadow-2xl",
+          "rounded-lg",
+          "z-50",
+          "flex-col",
+          "gap-2",
+          "py-4",
+          "px-3",
+          "transform",
+          "transition-all",
+          "duration-300",
+        );
+        mainNav.style.transform = "";
+        mainNav.style.opacity = "";
+        mainNav.style.top = "";
+        mainNav.style.right = "";
+
+        // Limpiar padding de los elementos li
+        mainNav.querySelectorAll("li").forEach((li) => {
+          li.style.padding = "";
+        });
+
+        overlay.classList.add("hidden");
+        // Scroll permitido - no restauramos overflow
+      }, 300);
+
+      mobileBtn.setAttribute("aria-expanded", "false");
+    }
+
+    // Toggle menú al hacer click en el botón hamburguesa
     mobileBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      if (window.innerWidth >= 768) return; // only on small screens
-      if (mainNav.classList.contains("hidden")) openMenu();
-      else hideMenu();
-    });
-
-    // Close when clicking outside
-    document.addEventListener("click", (e) => {
-      if (window.innerWidth >= 768) return;
-      if (
-        !mainNav.classList.contains("hidden") &&
-        !mainNav.contains(e.target) &&
-        e.target !== mobileBtn &&
-        !mobileBtn.contains(e.target)
-      ) {
-        hideMenu();
+      if (window.innerWidth < 768) {
+        // Solo en móvil
+        if (isMenuOpen) {
+          closeMenu();
+        } else {
+          openMenu();
+        }
       }
     });
 
-    // Close when a nav link is clicked (mobile)
-    mainNav.querySelectorAll("a").forEach((a) => {
-      a.addEventListener("click", () => {
-        if (window.innerWidth < 768) hideMenu();
+    // Cerrar menú al hacer click en el overlay
+    overlay.addEventListener("click", closeMenu);
+
+    // Cerrar menú al hacer click en un enlace
+    mainNav.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => {
+        if (window.innerWidth < 768) {
+          closeMenu();
+        }
       });
     });
+
+    // Cerrar menú al redimensionar a desktop
+    window.addEventListener("resize", () => {
+      if (window.innerWidth >= 768 && isMenuOpen) {
+        closeMenu();
+      }
+    });
+
+    // Inicializar con opacidad 0 y ligeramente hacia arriba
+    if (window.innerWidth < 768) {
+      mainNav.style.opacity = "0";
+      mainNav.style.transform = "translateY(-10px)";
+    }
   }
 });

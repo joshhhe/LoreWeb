@@ -1,6 +1,20 @@
 const pool = require("../config/database");
 
 const pagoModel = {
+  //obtener orden por id
+  getOrdenById: async (id_orden) => {
+    try {
+      const result = await pool.query(
+        "SELECT id_orden, estado, total FROM ordenes WHERE id_orden = $1",
+        [id_orden],
+      );
+      return result.rows[0];
+    } catch (error) {
+      console.error("Error obteniendo orden por id:", error);
+      throw error;
+    }
+  },
+
   //crear orden de pago e insertar en tabla ordenes
   createOrden: async (cabezera) => {
     const {
