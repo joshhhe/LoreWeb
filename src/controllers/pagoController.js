@@ -5,6 +5,7 @@ const pagoModel = require("../models/pagoModel");
 const createOrder = async (req, res) => {
   const {
     id_usuario,
+    correo,
     total,
     nombre,
     direccion,
@@ -17,6 +18,13 @@ const createOrder = async (req, res) => {
     postal,
     items,
   } = req.body;
+
+  const itemsFormatted = items.map((item) => ({
+    title: item.title,
+    quantity: Number(item.quantity),
+    unit_price: Number(item.unit_price),
+    currency_id: "CLP",
+  }));
 
   try {
     if (!process.env.MERCADO_PAGO_ACCESS_TOKEN) {
@@ -62,7 +70,10 @@ const createOrder = async (req, res) => {
 
     const result = await preference.create({
       body: {
-        items,
+        items: itemsFormatted,
+        payer: {
+          email: correo,
+        },
         external_reference: String(ordenId),
         back_urls: {
           success: "https://loreweb.onrender.com/productos?status=success",

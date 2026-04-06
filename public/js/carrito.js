@@ -14,6 +14,7 @@ const shippingInputs = document.querySelectorAll(
   'input[name="shipping-method"]',
 );
 const btnCheckOut = document.getElementById("checkout-btn");
+let currentEmail = "";
 
 let currentUserId = null;
 
@@ -158,6 +159,8 @@ async function loadSessionUser() {
     if (data?.autenticado && data?.usuario?.id) {
       currentUserId = data.usuario.id;
       console.log("Usuario autenticado con ID:", data);
+      currentEmail = data.usuario.email;
+      console.log("Email del usuario:", currentEmail);
     }
   } catch (error) {
     console.error("Error obteniendo sesión:", error);
@@ -206,6 +209,7 @@ btnCheckOut.addEventListener("click", async () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id_usuario: currentUserId,
+          correo: currentEmail,
           nombre: nombreUsuario.value.trim(),
           direccion: direccionUsuario.value.trim(),
           rut: rutUsuario.value.trim(),
