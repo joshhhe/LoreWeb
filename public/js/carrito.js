@@ -227,7 +227,7 @@ btnCheckOut.addEventListener("click", async () => {
       const data = await response.json();
       console.log("Respuesta backend:", data);
       if (response.ok) {
-        //window.location.href = data.result.init_point;
+        window.location.href = data.result.init_point;
         console.log(data);
       }
     } catch (error) {
